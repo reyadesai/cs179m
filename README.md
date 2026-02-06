@@ -1,38 +1,16 @@
-# SleepFit AI
+# React + Vite
 
- 
- Authors: [Reya Desai](https://github.com/reyadesai), Mehakdeep Kaeley, Angel Montes, [Nada Salib](https://github.com/nadasalib)
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Project Description
+Currently, two official plugins are available:
 
-### Motivation
-Healthcare is currently a luxury of the well-resourced. By using sleep and exercise data recorded by the CDC, we alleviate the financial and geographic barriers to preventative care. Our goal is to expand access to healthcare information to neglected populations in a quick and affordable way. We encourage preventative measures for at-risk individuals by providing risk assessments and actionable recommendations.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### Languages, Tools, and Technologies
-The project will primarily use Python for programming the AI model and CSS and HTML for the web-based user interface. Beyond that, GitHub and Visual Studio Code will be used to create this program.
+## React Compiler
 
-### Inputs and Outputs
-The inputs consist of user provided information like age and responses to the included questionnaire. Using this information, the program outputs a user-friendly report that summarizes the risk factors of the user's habits along with CDC recommendations to remediate behavior to meet guidelines.
- 
-### Features
-* Comprehensive questionnaire: Digestible questions to gauge lifestyle habits.
-* Report generation: Presents information about the user's risk level, contributing factors, and corresponding recommendations.
-* Web-based User Interface: Displays the questionnaire and report in accessible language and formats.
-* Privacy: No personal information is stored, the questionnaire is solely meant to assess the user in the current session.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## User Interface Specification
+## Expanding the ESLint configuration
 
-### Navigation Diagram
-
-### Screen Layouts
-
-## Class Diagram
-<img src="SleepFit AI UML Diagram.jpeg?raw=true" width="1000">
- 
-## Screenshots
- 
-## Installation/Usage
-
-## Testing
-
-## Acknowledgements
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
