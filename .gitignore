@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+nhanes_physical_activity/data/*.xpt
+nhanes_physical_activity/data/*.csv
