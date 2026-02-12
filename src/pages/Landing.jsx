@@ -15,7 +15,7 @@ export default function Landing() {
   return (
     <div style={{ padding: 32, maxWidth: 500, margin: "0 auto" }}>
       <h1>SleepFit</h1>
-      <p>Check your sleep health in under 2 minutes.</p>
+ 
 
       <div style={{ marginTop: 24 }}>
         <label style={{ display: "block", marginBottom: 8 }}>
