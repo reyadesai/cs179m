@@ -7,23 +7,71 @@ export default function Results() {
 
   if (!answers) {
     return (
-      <div style={{ padding: 32 }}>
-        <p>No results found. Please take the survey first.</p>
-        <button onClick={() => navigate("/")}>Go Home</button>
+      <div>
+        <header className="gv-topbar">
+          <div className="gv-brand">SleepFit AI</div>
+          <div className="gv-lang">
+            <button className="gv-chip" type="button">English</button>
+            <button className="gv-chip" type="button">Español</button>
+          </div>
+        </header>
+
+        <main className="gv-shell">
+          <section className="gv-card">
+            <h2>No results found</h2>
+            <div className="gv-sub">Please take the survey first.</div>
+            <div className="gv-footer">
+              <button className="gv-btn primary" onClick={() => navigate("/")} type="button">
+                Go Home
+              </button>
+            </div>
+          </section>
+        </main>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: 32, maxWidth: 800, margin: "0 auto" }}>
-      <h1>Results (temporary)</h1>
-      <p>This is just to confirm we captured survey responses.</p>
-      <pre style={{ background: "#f6f6f6", padding: 16, overflow: "auto" }}>
-        {JSON.stringify(answers, null, 2)}
-      </pre>
-      <button onClick={() => navigate("/survey", { state: { age: answers.age } })}>
-        Retake Survey
-      </button>
+    <div>
+      <header className="gv-topbar">
+        <div className="gv-brand">SleepFit AI</div>
+        <div className="gv-lang">
+          <button className="gv-chip" type="button">English</button>
+          <button className="gv-chip" type="button">Español</button>
+        </div>
+      </header>
+
+      <main className="gv-shell">
+        <section className="gv-card">
+          <h2>Results</h2>
+          <div className="gv-sub">Temporary screen — confirming we captured responses.</div>
+
+          <pre
+            style={{
+              marginTop: 18,
+              background: "#f6f8ff",
+              border: "1px solid var(--gv-border)",
+              padding: 16,
+              borderRadius: 12,
+              overflow: "auto",
+              textAlign: "left",
+              maxHeight: 380,
+            }}
+          >
+            {JSON.stringify(answers, null, 2)}
+          </pre>
+
+          <div className="gv-footer">
+            <button
+              className="gv-btn primary"
+              onClick={() => navigate("/survey", { state: { age: answers.age } })}
+              type="button"
+            >
+              Retake Survey
+            </button>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

@@ -3,7 +3,7 @@ export const surveyQuestions = [
     // sleep
     {
       id: "work",
-      section: "Sleep Screening",
+      section: "Work",
       type: "yesno",
       question: "Do you work?",
     },
@@ -50,8 +50,8 @@ export const surveyQuestions = [
       id: "moderate_min_week", 
       section: "Physical Activity Screening",
       type: "frequency",
-      question: "How often do you do moderate-intensity leisure-time physical activities?",
-      sublabel: "a. Number of times (per day, week, or year)",
+      question: "How often do you do moderate-intensity leisure-time physical activities? Ex) Brisk walking" ,
+      sublabel: "a. Number of times (per week)",
     },
     {
       id: "moderate_duration_each",
@@ -66,8 +66,8 @@ export const surveyQuestions = [
       id: "vigorous_min_week", 
       section: "Physical Activity Screening",
       type: "frequency",
-      question: "How often do you do vigorous-intensity leisure-time physical activities?",
-      sublabel: "a. Number of times (per day, week, or year)",
+      question: "How often do you do vigorous-intensity leisure-time physical activities? Ex) Running or jogging",
+      sublabel: "a. Number of times (per week)",
     },
     {
       id: "vigorous_duration_each",

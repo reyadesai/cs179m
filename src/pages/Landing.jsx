@@ -12,50 +12,70 @@ export default function Landing() {
     navigate("/survey", { state: { age: Number(age) } });
   };
 
+  const stepMeta = [
+    { label: "About You" },
+    { label: "Sleep" },
+    { label: "Activity" },
+    { label: "Summary" },
+  ];
+
   return (
-    <div style={{ padding: 32, maxWidth: 500, margin: "0 auto" }}>
-      <h1>SleepFit</h1>
- 
+    <div>
+      <header className="gv-topbar">
+        <div className="gv-brand">SleepFit AI</div>
+        <div className="gv-lang">
+          <button className="gv-chip" type="button">English</button>
+          <button className="gv-chip" type="button">Español</button>
+        </div>
+      </header>
 
-      <div style={{ marginTop: 24 }}>
-        <label style={{ display: "block", marginBottom: 8 }}>
-          Enter your age
-        </label>
+      <main className="gv-shell">
 
-        <input
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          placeholder="e.g. 22"
-          min={10}
-          max={100}
-          style={{
-            width: "100%",
-            padding: 10,
-            fontSize: 16,
-            marginBottom: 8,
-          }}
-        />
+        {/* progress bar */}
+        <div className="gv-stepper" aria-label="Progress">
+          {stepMeta.map((s, idx) => (
+            <div
+              key={s.label}
+              className={`gv-step ${idx === 0 ? "active" : ""}`}
+            >
+              <div className="dot" />
+              <label>{s.label}</label>
+            </div>
+          ))}
+        </div>
 
-        {!isValidAge && age !== "" && (
-          <p style={{ color: "red", fontSize: 14 }}>
-            Please enter a valid age (10–100).
-          </p>
-        )}
-      </div>
+        <section className="gv-card">
+          <h2>Tell us about yourself</h2>
+          <div className="gv-sub">
+            This helps us personalize your sleep and activity insights.
+          </div>
 
-      <button
-        onClick={handleStart}
-        disabled={!isValidAge}
-        style={{
-          marginTop: 16,
-          padding: "12px 16px",
-          fontSize: 16,
-          cursor: isValidAge ? "pointer" : "not-allowed",
-        }}
-      >
-        Start Survey →
-      </button>
+          <div className="gv-q">What is your age?</div>
+          <input
+            className="gv-input"
+            type="number"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            min={10}
+            max={100}
+          />
+
+          {!isValidAge && age !== "" && (
+            <div className="gv-error">Please enter a valid age (10–100).</div>
+          )}
+
+          <div className="gv-footer">
+            <button
+              className="gv-btn primary"
+              onClick={handleStart}
+              disabled={!isValidAge}
+              type="button"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
