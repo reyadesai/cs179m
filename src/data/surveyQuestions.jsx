@@ -50,42 +50,42 @@ export const surveyQuestions = [
       id: "moderate_min_week", 
       section: "Physical Activity Screening",
       type: "frequency",
-      question: "How often do you do moderate-intensity leisure-time physical activities? Ex) Brisk walking" ,
-      sublabel: "a. Number of times (per week)",
+      question: "How often do you do activities that make you breathe a little harder than normal, but you can still talk? \n (Example: walking fast)" ,
+      sublabel: "Number of times per week",
     },
     {
       id: "moderate_duration_each",
       section: "Physical Activity Screening",
       type: "duration",
       question:
-        "About how long do you do these moderate leisure-time physical activities each time?",
-      sublabel: "a. Time in minutes/hours",
+        "About how long do you do these physical activities each time?",
+      sublabel: "Time in minutes/hours",
       dependsOnAnswered: "moderate_min_week", // show only if Q1 answered
     },
     {
       id: "vigorous_min_week", 
       section: "Physical Activity Screening",
       type: "frequency",
-      question: "How often do you do vigorous-intensity leisure-time physical activities? Ex) Running or jogging",
-      sublabel: "a. Number of times (per week)",
+      question: "How often do you do activities that make you breathe very hard, where it is difficult to talk? \n (Example: running or basketball)",
+      sublabel: "Number of times per week",
     },
     {
       id: "vigorous_duration_each",
       section: "Physical Activity Screening",
       type: "duration",
       question:
-        "About how long do you do these vigorous leisure-time physical activities each time?",
-      sublabel: "a. Time in minutes/hours",
+        "About how long do you do these physical activities each time?",
+      sublabel: "Time in minutes/hours",
       dependsOnAnswered: "vigorous_min_week", // show only if Q3 answered
     },
     {
         id: "sedentary_hours_day",
         section: "Physical Activity Screening",
         type: "duration",
-        question: "How much time do you usually spend sitting on a typical day?",
-        sublabel: "a. Time in minutes/hours",
-        info:
-          "This includes sitting at school, at home, getting to and from places, or with friends including time spent sitting at a desk, traveling in a car or bus, reading, playing cards, watching television, or using a computer. Do not include time spent sleeping.",
+        question: "How much time do you usually spend sitting on a typical day? \n This includes sitting at school, at home, getting to and from places, or with friends including time spent sitting at a desk, traveling in a car or bus, reading, playing cards, watching television, or using a computer. Do not include time spent sleeping.",
+        sublabel: "Time in minutes/hours",
+        // info:
+        //   "This includes sitting at school, at home, getting to and from places, or with friends including time spent sitting at a desk, traveling in a car or bus, reading, playing cards, watching television, or using a computer. Do not include time spent sleeping.",
       },
       
   ];

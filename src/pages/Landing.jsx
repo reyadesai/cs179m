@@ -5,7 +5,7 @@ export default function Landing() {
   const [age, setAge] = useState("");
   const navigate = useNavigate();
 
-  const isValidAge = age !== "" && Number(age) >= 10 && Number(age) <= 100;
+  const isValidAge = age !== "" && Number(age) >= 18 && Number(age) <= 100;
 
   const handleStart = () => {
     if (!isValidAge) return;
@@ -21,14 +21,6 @@ export default function Landing() {
 
   return (
     <div>
-      <header className="gv-topbar">
-        <div className="gv-brand">SleepFit AI</div>
-        <div className="gv-lang">
-          <button className="gv-chip" type="button">English</button>
-          <button className="gv-chip" type="button">Español</button>
-        </div>
-      </header>
-
       <main className="gv-shell">
 
         {/* progress bar */}
@@ -56,13 +48,18 @@ export default function Landing() {
             type="number"
             value={age}
             onChange={(e) => setAge(e.target.value)}
-            min={10}
+            min={18}
             max={100}
+            style={{
+              background: "#f5f7fa",
+              color: "#000000",
+              border: "2px solid #d1d9e6",
+            }}
           />
 
-          {!isValidAge && age !== "" && (
-            <div className="gv-error">Please enter a valid age (10–100).</div>
-          )}
+          {/* {!isValidAge && age !== "" && (
+            <div className="gv-error">Please enter a valid age (18–100).</div>
+          )} */}
 
           <div className="gv-footer">
             <button
