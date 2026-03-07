@@ -74,7 +74,6 @@ export default function Survey() {
   const location = useLocation();
   const navigate = useNavigate();
 
-
   const age = location.state?.age;
 
   if (!age) {
@@ -89,6 +88,8 @@ export default function Survey() {
 
   const [answers, setAnswers] = useState({ age });
   const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const stepMeta = [
     {
@@ -125,18 +126,13 @@ export default function Survey() {
 
     if (question.type === "time12") {
       if (typeof val !== "object" || !val) return false;
-
       const hourNum = Number(val.hour);
       const minuteNum = Number(val.minute);
-
       const hourOk =
         val.hour !== "" && !Number.isNaN(hourNum) && hourNum >= 1 && hourNum <= 12;
-
       const minuteOk =
         val.minute !== "" && !Number.isNaN(minuteNum) && minuteNum >= 0 && minuteNum <= 59;
-
       const ampmOk = val.ampm === "AM" || val.ampm === "PM";
-
       return hourOk && minuteOk && ampmOk;
     }
 
@@ -167,18 +163,15 @@ export default function Survey() {
         const depVal = answers[q.dependsOn.id];
         if (depVal !== q.dependsOn.equals) return false;
       }
-
       if (q.dependsOnAnswered) {
         const depQ = surveyQuestions.find((x) => x.id === q.dependsOnAnswered);
         if (!depQ) return true;
         if (!isAnswered(depQ)) return false;
       }
-
       if (q.optionalIf) {
         const depVal = answers[q.optionalIf.id];
         if (depVal === q.optionalIf.equals) return false;
       }
-
       return true;
     });
   }, [answers]);
@@ -186,15 +179,15 @@ export default function Survey() {
   if (!visibleQuestions.length) {
     return (
       <div>
-        <header className="gv-topbar">
+        {/* <header className="gv-topbar">
           <div className="gv-brand">SleepFit AI</div>
           <div className="gv-lang">
             <button className="gv-chip" type="button">English</button>
             <button className="gv-chip" type="button">Español</button>
           </div>
-        </header>
+        </header> */}
         <main className="gv-shell">
-          <section className="gv-card">
+          {/* <section className="gv-card">
             <h2>No questions to show</h2>
             <div className="gv-sub">Your filters removed all questions.</div>
             <div className="gv-footer">
@@ -202,7 +195,7 @@ export default function Survey() {
                 Go Home
               </button>
             </div>
-          </section>
+          </section> */}
         </main>
       </div>
     );
@@ -232,15 +225,45 @@ export default function Survey() {
     else setStep((s) => Math.max(0, s - 1));
   }
 
-  function handleNext() {
+  async function handleNext() {
     if (!isAnswered(q)) return;
 
     if (safeStep === visibleQuestions.length - 1) {
-      navigate("/results", { state: { answers } });
+      // Last question —> submit to backend
+      setSubmitting(true);
+      setSubmitError(null);
+      try {
+        const response = await fetch("/api/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(answers),
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || "Server error");
+        }
+
+        const result = await response.json();
+        navigate("/results", { state: { answers, result } });
+      } catch (err) {
+        setSubmitError(err.message || "Could not reach the server. Is the backend running?");
+      } finally {
+        setSubmitting(false);
+      }
     } else {
       setStep((s) => s + 1);
     }
   }
+
+  const getDefaultAmPm = (questionId) => {
+    const pmDefaults = ["bedtime", "usual_bedtime", "sleep_time"];
+    const amDefaults = ["waketime", "wake_time", "usual_waketime"];
+    
+    if (pmDefaults.some(id => questionId.includes(id))) return "PM";
+    if (amDefaults.some(id => questionId.includes(id))) return "AM";
+    return "AM"; // default fallback
+  };
 
   const currentValue =
     answers[q.id] ??
@@ -249,19 +272,11 @@ export default function Survey() {
       : q.type === "duration"
       ? { value: "", unit: "minutes" }
       : q.type === "time12"
-      ? { hour: "", minute: "", ampm: "AM" }
+      ? { hour: "", minute: "", ampm: getDefaultAmPm(q.id) }
       : "");
 
   return (
     <div>
-      <header className="gv-topbar">
-        <div className="gv-brand">SleepFit AI</div>
-        <div className="gv-lang">
-          <button className="gv-chip" type="button">English</button>
-          <button className="gv-chip" type="button">Español</button>
-        </div>
-      </header>
-
       <main className="gv-shell">
         <div className="gv-stepper" aria-label="Progress">
           {stepMeta.map((s, idx) => (
@@ -317,140 +332,106 @@ export default function Survey() {
             </div>
           )}
 
-{q.type === "time12" && (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 10,
-      marginTop: 10,
-    }}
-  >
-    {!q.sublabel && (
-      <div style={{ fontWeight: 600, marginTop: 10 }}>
-        a. Time (12-hour format)
-      </div>
-    )}
-
-    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-      {/* hour dropdown */}
-      <select
-        value={currentValue.hour}
-        onChange={(e) =>
-          updateAnswer(q.id, { ...currentValue, hour: e.target.value })
-        }
-        style={{
-          width: 90,
-          padding: 12,
-          fontSize: 16,
-          textAlign: "center",
-          borderRadius: 12,
-          border: "2px solid var(--gv-border)",
-          background: "#000000",
-        }}
-      >
-        <option value="" disabled>
-          hh
-        </option>
-        {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((h) => (
-          <option key={h} value={h}>
-            {h}
-          </option>
-        ))}
-      </select>
-
-      <span style={{ fontSize: 18, fontWeight: 700 }}>:</span>
-
-      {/* min dropdown */}
-      <select
-        value={currentValue.minute}
-        onChange={(e) =>
-          updateAnswer(q.id, { ...currentValue, minute: e.target.value })
-        }
-        style={{
-          width: 90,
-          padding: 12,
-          fontSize: 16,
-          textAlign: "center",
-          borderRadius: 12,
-          border: "2px solid var(--gv-border)",
-          background: "#000000",
-        }}
-      >
-        <option value="" disabled>
-          mm
-        </option>
-        {["00", "15", "30", "45"].map((m) => (
-          <option key={m} value={m}>
-            {m}
-          </option>
-        ))}
-      </select>
-
-      {/* am/pm dropdown */}
-      <select
-        value={currentValue.ampm}
-        onChange={(e) =>
-          updateAnswer(q.id, { ...currentValue, ampm: e.target.value })
-        }
-        style={{
-          width: 90,
-          padding: 12,
-          fontSize: 16,
-          borderRadius: 12,
-          border: "2px solid var(--gv-border)",
-          background: "#000000",
-        }}
-      >
-        <option value="AM">AM</option>
-        <option value="PM">PM</option>
-      </select>
-    </div>
-
-    <div style={{ fontSize: 12, opacity: 0.8 }}>
-     
-    </div>
-  </div>
-)}
+          {q.type === "time12" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 10,
+                marginTop: 10,
+              }}
+            >
+              {!q.sublabel && (
+                <div style={{ fontWeight: 600, marginTop: 10 }}>
+                  Time (12-hour format)
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <select
+                  value={currentValue.hour}
+                  onChange={(e) =>
+                    updateAnswer(q.id, { ...currentValue, hour: e.target.value })
+                  }
+                  style={{
+                    width: 90, padding: 12, fontSize: 16, textAlign: "center",
+                    borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000",
+                  }}
+                >
+                  <option value="" disabled>hh</option>
+                  {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((h) => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>:</span>
+                <select
+                  value={currentValue.minute}
+                  onChange={(e) =>
+                    updateAnswer(q.id, { ...currentValue, minute: e.target.value })
+                  }
+                  style={{
+                    width: 90, padding: 12, fontSize: 16, textAlign: "center",
+                    borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000",
+                  }}
+                >
+                  <option value="" disabled>mm</option>
+                  {["00", "15", "30", "45"].map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={currentValue.ampm}
+                  onChange={(e) =>
+                    updateAnswer(q.id, { ...currentValue, ampm: e.target.value })
+                  }
+                  style={{
+                    width: 90, padding: 12, fontSize: 16,
+                    borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000",
+                  }}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+          )}
 
           {q.type === "frequency" && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center"}}>
               <input
                 type="number"
                 min="0"
                 value={currentValue.count}
                 onChange={(e) => updateAnswer(q.id, { ...currentValue, count: e.target.value })}
                 className="gv-input"
-                style={{ width: 140, textAlign: "center", marginTop: 0 }}
+                style={{ width: 140, textAlign: "center", marginTop: 0, background: "#f5f7fa", color: "#000000"}}
               />
-              <span>per</span>
-              <select
+              <span>per week</span>
+              {/* Client feedback: always assume per week, don't bother with day/year entries
+                  <select
                 value={currentValue.per}
                 onChange={(e) => updateAnswer(q.id, { ...currentValue, per: e.target.value })}
                 style={{ padding: 12, fontSize: 16, borderRadius: 12, border: "2px solid var(--gv-border)" }}
               >
-              
                 <option value="week">week</option>
-               
-              </select>
+              </select> */}
             </div>
           )}
 
           {q.type === "duration" && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center"}}>
               <input
                 type="number"
                 min="0"
                 value={currentValue.value}
                 onChange={(e) => updateAnswer(q.id, { ...currentValue, value: e.target.value })}
                 className="gv-input"
-                style={{ width: 140, textAlign: "center", marginTop: 0 }}
+                style={{ width: 140, textAlign: "center", marginTop: 0, background: "#f5f7fa", color: "#000000"}}
               />
               <select
                 value={currentValue.unit}
                 onChange={(e) => updateAnswer(q.id, { ...currentValue, unit: e.target.value })}
-                style={{ padding: 12, fontSize: 16, borderRadius: 12, border: "2px solid var(--gv-border)" }}
+                style={{ padding: 12, fontSize: 16, borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000"}}
               >
                 <option value="minutes">minutes</option>
                 <option value="hours">hours</option>
@@ -469,19 +450,29 @@ export default function Survey() {
               />
             )}
 
-          {!isAnswered(q) && <div className="gv-error">Please answer to continue.</div>}
+          {/* {!isAnswered(q) && <div className="gv-error">Please answer to continue.</div>} */}
+
+          {submitError && (
+            <div className="gv-error" style={{ marginTop: 12 }}>
+              ⚠ {submitError}
+            </div>
+          )}
 
           <div className="gv-footer">
-            <button className="gv-btn ghost" onClick={handleBack} type="button">
+            <button className="gv-btn ghost" onClick={handleBack} type="button" disabled={submitting}>
               ← Back
             </button>
             <button
               className="gv-btn primary"
               onClick={handleNext}
-              disabled={!isAnswered(q)}
+              disabled={!isAnswered(q) || submitting}
               type="button"
             >
-              {safeStep === visibleQuestions.length - 1 ? "Submit" : "Next"}
+              {submitting
+                ? "Analyzing…"
+                : safeStep === visibleQuestions.length - 1
+                ? "Submit"
+                : "Next"}
             </button>
           </div>
         </section>
