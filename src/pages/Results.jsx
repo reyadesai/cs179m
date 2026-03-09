@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import HealthInfoFooter from "../components/HealthInfoFooter";
 
 const PRIORITY_COLORS = {
   high:   { bg: "#fff5f5", border: "#feb2b2", badge: "#e53e3e", text: "#742a2a" },
@@ -172,7 +173,7 @@ export default function Results() {
 
   <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
-    <main className="gv-shell" style={{ paddingTop: 350 }}> {/* paddingTop pushes content down, otherwise nothing above "Your Results" is visible */}
+    <main className="gv-shell" style={{ paddingTop: 800 }}> {/* paddingTop pushes content down, otherwise nothing above "Your Results" is visible */}
       {/* Progress stepper*/}
       <div className="gv-stepper" aria-label="Progress" style={{ marginBottom: 20 }}>
         {stepMeta.map((s, idx) => (
@@ -319,6 +320,7 @@ export default function Results() {
             </button>
           </div>
         </section>
+        <HealthInfoFooter />
       </main>
     </div>
   );
