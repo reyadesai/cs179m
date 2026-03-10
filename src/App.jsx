@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
 import Survey from "./pages/Survey";
 import Results from "./pages/Results";
@@ -20,12 +21,13 @@ function GlobalStyles() {
         --gv-radius: 16px;
       }
 
-      html, body { 
-        height: 100%; 
-        width: 100%; 
+      html, body {
+        height: 100%;
+        width: 100%;
         margin: 0;
         padding: 0;
       }
+
       body {
         font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
         background: var(--gv-bg);
@@ -47,14 +49,11 @@ function GlobalStyles() {
         margin: 0;
         padding: 0 22px;
         box-sizing: border-box;
-
         background: var(--gv-brand);
         color: #fff;
-
         display:flex;
         align-items:center;
         justify-content:space-between;
-
         position: sticky;
         top: 0;
         z-index: 9999;
@@ -77,23 +76,25 @@ function GlobalStyles() {
       .gv-chip{
         appearance: none;
         -webkit-appearance: none;
-
         border: 1px solid rgba(15, 23, 42, 0.18);
         background: rgba(255,255,255,0.95);
         color: #0f172a;
-
         border-radius: 10px;
         padding: 8px 12px;
         font-weight: 800;
         font-size: 13px;
         cursor:pointer;
-
         box-shadow: 0 2px 10px rgba(0,0,0,0.14);
-
         display: inline-flex;
         align-items: center;
         justify-content: center;
       }
+
+      .gv-chip.active{
+        background: #dbeafe;
+        border-color: #93c5fd;
+      }
+
       .gv-chip:hover{ background: #ffffff; }
 
       .gv-shell{
@@ -112,7 +113,6 @@ function GlobalStyles() {
         position: relative;
       }
 
-      /* background progress line */
       .gv-stepper::before{
         content:"";
         position:absolute;
@@ -143,22 +143,17 @@ function GlobalStyles() {
         box-shadow:0 1px 0 rgba(0,0,0,0.04);
       }
 
-      /* completed steps */
       .gv-step.done .dot{
         border-color:var(--gv-brand);
         background:var(--gv-brand);
       }
 
-      /* active step */
       .gv-step.active .dot{
         border-color:var(--gv-brand);
         background:#fff;
         box-shadow:0 0 0 5px rgba(47, 99, 212, 0.15);
       }
-      .gv-step.done .dot{
-        border-color: var(--gv-brand);
-        background: var(--gv-brand);
-      }
+
       .gv-step label{
         font-size: 15px;
         color: var(--gv-muted);
@@ -176,6 +171,7 @@ function GlobalStyles() {
         text-align:center;
         overflow: visible;
       }
+
       .gv-card h1, .gv-card h2{ margin: 0; padding-top: 20px; }
       .gv-card h2{ font-size: 37px; letter-spacing: -0.3px; }
 
@@ -184,6 +180,7 @@ function GlobalStyles() {
         color: var(--gv-muted);
         font-size: 17px;
       }
+
       .gv-q{
         margin-top: 32px;
         font-size: 20px;
@@ -200,6 +197,7 @@ function GlobalStyles() {
         margin-top: 12px;
         transition: box-shadow .15s ease, border-color .15s ease;
       }
+
       .gv-input:focus{
         border-color: var(--gv-brand);
         box-shadow: 0 0 0 5px rgba(47, 99, 212, 0.15);
@@ -212,6 +210,7 @@ function GlobalStyles() {
         gap: 17px;
         flex-wrap: wrap;
       }
+
       .gv-option{
         min-width: 200px;
         padding: 17px 22px;
@@ -224,6 +223,7 @@ function GlobalStyles() {
         transition: all .15s ease;
         color: var(--gv-text);
       }
+
       .gv-option.selected{
         border-color: var(--gv-brand);
         background: rgba(47, 99, 212, 0.10);
@@ -236,6 +236,7 @@ function GlobalStyles() {
         justify-content:center;
         gap: 15px;
       }
+
       .gv-btn{
         border: none;
         border-radius: 12px;
@@ -244,54 +245,99 @@ function GlobalStyles() {
         font-size: 18px;
         cursor: pointer;
       }
+
       .gv-btn.primary{
         background: var(--gv-brand);
         color: #fff;
         box-shadow: var(--gv-shadow-sm);
       }
+
       .gv-btn.primary:disabled{
         cursor: not-allowed;
         opacity: 0.55;
         box-shadow: none;
       }
+
       .gv-btn.ghost{
         background: transparent;
         border: 1px solid var(--gv-border);
         color: var(--gv-text);
       }
 
-      .gv-error{ color: #b91c1c; margin-top: 15px; font-weight: 700; font-size: 16px; }
+      .gv-error{
+        color: #b91c1c;
+        margin-top: 15px;
+        font-weight: 700;
+        font-size: 16px;
+      }
     `}</style>
   );
 }
 
-function Layout({ children }) {
+function Layout({ children, language, setLanguage }) {
   return (
     <>
       <header className="gv-topbar">
         <div className="gv-brand">SleepFit AI</div>
         <div className="gv-lang">
-          <button className="gv-chip" type="button">English</button>
-          <button className="gv-chip" type="button">Español</button>
+          <button
+            className={`gv-chip ${language === "en" ? "active" : ""}`}
+            type="button"
+            onClick={() => setLanguage("en")}
+          >
+            English
+          </button>
+          <button
+            className={`gv-chip ${language === "es" ? "active" : ""}`}
+            type="button"
+            onClick={() => setLanguage("es")}
+          >
+            Español
+          </button>
         </div>
       </header>
 
-      <main className="gv-shell">
-        {children}
-      </main>
+      <main className="gv-shell">{children}</main>
     </>
   );
 }
 
 export default function App() {
+  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "en");
+
+  useEffect(() => {
+    localStorage.setItem("language", language);
+  }, [language]);
+
   return (
     <BrowserRouter>
       <GlobalStyles />
-        <Routes>
-          <Route path="/" element={<Layout><Landing /></Layout>} />
-          <Route path="/survey" element={<Layout><Survey /></Layout>} />
-          <Route path="/results" element={<Layout><Results /></Layout>} />
-        </Routes>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout language={language} setLanguage={setLanguage}>
+              <Landing language={language} />
+            </Layout>
+          }
+        />
+        <Route
+          path="/survey"
+          element={
+            <Layout language={language} setLanguage={setLanguage}>
+              <Survey language={language} />
+            </Layout>
+          }
+        />
+        <Route
+          path="/results"
+          element={
+            <Layout language={language} setLanguage={setLanguage}>
+              <Results language={language} />
+            </Layout>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
