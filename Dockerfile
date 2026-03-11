@@ -1,16 +1,17 @@
-FROM node:20-alpine AS frontend-build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
 FROM python:3.11-slim
+
 WORKDIR /app
-COPY requirements.txt .
+
+# Install backend dependencies
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-COPY --from=frontend-build /app/dist ./dist
-COPY . .
+
+# Copy backend code and model bundle
+COPY backend ./backend
+COPY lightGBM ./lightGBM
+
+WORKDIR /app/backend
 
 EXPOSE 8000
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
