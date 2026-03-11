@@ -15,7 +15,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "https://cs179m.vercel.app",
-        "https://cs179m-production-c459.up.railway.app"
+        "https://cs179m-production-3be7.up.railway.app"
     ],
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,7 +27,7 @@ try:
     bundle = joblib.load(BUNDLE_PATH)
     model = bundle["model"]
     features = bundle["features"]
-    print(f"✅ Model loaded. Features: {features}", flush=True)
+    print(f"Model loaded. Features: {features}", flush=True)
 except Exception as e:
     traceback.print_exc()
     raise RuntimeError(f"Could not load model from {BUNDLE_PATH}: {e}")
