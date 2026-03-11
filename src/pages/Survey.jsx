@@ -233,9 +233,13 @@ export default function Survey() {
       setSubmitting(true);
       setSubmitError(null);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        console.log("Calling API:", `${API_URL}/predict`);
+        const response = await fetch(`${API_URL}/predict`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(answers),
         });
 
