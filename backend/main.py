@@ -10,13 +10,26 @@ import traceback
 
 app = FastAPI()
 
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#         "http://localhost:5173",
+#         "https://cs179m.vercel.app",
+#         "https://cs179m-production-3be7.up.railway.app"
+#     ],
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+app = FastAPI()
+origins = ["http://localhost:5173"] # for localhost testing
+
+# CORS config for Vercel + local dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://cs179m.vercel.app",
-        "https://cs179m-production-3be7.up.railway.app"
-    ],
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # all Vercel domains
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -331,6 +344,10 @@ def generate_recommendations(raw: dict, score: float) -> list:
 
     return recs
 
+# check if railway is running
+@app.get("/ping")
+def ping():
+    return {"status": "pong"}
 
 
 @app.post("/predict")
@@ -374,3 +391,4 @@ def health():
         "bundle_path": BUNDLE_PATH,
         "bundle_exists": os.path.exists(BUNDLE_PATH),
     }
+
