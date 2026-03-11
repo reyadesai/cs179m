@@ -164,9 +164,9 @@ def main():
         },
     }
 
-    save_path = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
-    joblib.dump(bundle, save_path)
-    # joblib.dump(bundle, "lgbm_overall_score.pkl")
+    # save_path = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
+    # joblib.dump(bundle, save_path)
+    joblib.dump(bundle, "lgbm_overall_score.pkl")
     print("Saved: lgbm_overall_score.pkl")
 
     # Show a few examples
