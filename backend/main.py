@@ -34,7 +34,7 @@ app.add_middleware(
 import traceback
 import joblib
 
-BUNDLE_PATH = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
+BUNDLE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lgbm_overall_score.pkl")
 print("DEBUG __file__ =", __file__)
 print("DEBUG cwd =", os.getcwd())
 print("DEBUG bundle path =", BUNDLE_PATH)
