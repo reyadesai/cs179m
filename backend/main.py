@@ -16,19 +16,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model
+# # Load model
+# BUNDLE_PATH = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
+
+# try:
+#     bundle = joblib.load(BUNDLE_PATH)
+#     model = bundle["model"]
+#     features = bundle["features"]
+#     print("Model loaded. Features:", features)
+# except Exception as e:
+#     print(f"WARNING: Could not load model: {e}")
+#     model = None
+#     features = []
+
+# --------- TEST---------
+import os
+import traceback
+import joblib
+
 BUNDLE_PATH = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
+print("DEBUG __file__ =", __file__)
+print("DEBUG cwd =", os.getcwd())
+print("DEBUG bundle path =", BUNDLE_PATH)
+print("DEBUG bundle exists =", os.path.exists(BUNDLE_PATH))
 
 try:
     bundle = joblib.load(BUNDLE_PATH)
     model = bundle["model"]
     features = bundle["features"]
-    print("Model loaded. Features:", features)
+    print("DEBUG model loaded successfully")
+    print("DEBUG features =", features)
 except Exception as e:
-    print(f"WARNING: Could not load model: {e}")
+    print("DEBUG model load failed:", repr(e))
+    traceback.print_exc()
     model = None
     features = []
-
+# --------- TEST---------
 
 
 # request schema, follows surveyQuestions.jsx field IDs
@@ -360,6 +383,15 @@ def predict(answers: SurveyAnswers):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# @app.get("/health")
+# def health():
+#     return {"status": "ok", "model_loaded": model is not None}
 @app.get("/health")
 def health():
-    return {"status": "ok", "model_loaded": model is not None}
+    return {
+        "status": "ok",
+        "model_loaded": model is not None,
+        "cwd": os.getcwd(),
+        "bundle_path": BUNDLE_PATH,
+        "bundle_exists": os.path.exists(BUNDLE_PATH),
+    }
