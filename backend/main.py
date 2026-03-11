@@ -12,6 +12,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173","https://cs179m.vercel.app","https://cs179m-production-c459.up.railway.app"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -30,7 +31,6 @@ app.add_middleware(
 #     features = []
 
 # --------- TEST---------
-import os
 import traceback
 import joblib
 
