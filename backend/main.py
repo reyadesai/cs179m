@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 import joblib
@@ -9,9 +11,15 @@ import os
 
 app = FastAPI()
 
+app.mount("/", StaticFiles(directory="dist", html=True), name="static")
+
+@app.get("/")
+def serve_index():
+    return FileResponse("dist/index.html")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","https://cs179m.vercel.app","https://cs179m-production-c459.up.railway.app/"],
+    allow_origins=["http://localhost:5173","https://cs179m.vercel.app","https://cs179m-production-c459.up.railway.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
