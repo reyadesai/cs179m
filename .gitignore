@@ -26,3 +26,6 @@ dist-ssr
 
 nhanes_physical_activity/data/*.xpt
 nhanes_physical_activity/data/*.csv
+
+__pycache__/
+*.pyc
