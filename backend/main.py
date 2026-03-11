@@ -6,52 +6,31 @@ import joblib
 import pandas as pd
 import numpy as np
 import os
+import traceback
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","https://cs179m.vercel.app","https://cs179m-production-c459.up.railway.app"],
-    #allow_credentials=True,
+    allow_origins=[
+        "http://localhost:5173",
+        "https://cs179m.vercel.app",
+        "https://cs179m-production-c459.up.railway.app"
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# # Load model
-# BUNDLE_PATH = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
-
-# try:
-#     bundle = joblib.load(BUNDLE_PATH)
-#     model = bundle["model"]
-#     features = bundle["features"]
-#     print("Model loaded. Features:", features)
-# except Exception as e:
-#     print(f"WARNING: Could not load model: {e}")
-#     model = None
-#     features = []
-
-# --------- TEST---------
-import traceback
-import joblib
-
 BUNDLE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lgbm_overall_score.pkl")
-print("DEBUG __file__ =", __file__)
-print("DEBUG cwd =", os.getcwd())
-print("DEBUG bundle path =", BUNDLE_PATH)
-print("DEBUG bundle exists =", os.path.exists(BUNDLE_PATH))
 
 try:
     bundle = joblib.load(BUNDLE_PATH)
     model = bundle["model"]
     features = bundle["features"]
-    print("DEBUG model loaded successfully")
-    print("DEBUG features =", features)
+    print(f"✅ Model loaded. Features: {features}", flush=True)
 except Exception as e:
-    print("DEBUG model load failed:", repr(e))
     traceback.print_exc()
-    model = None
-    features = []
-# --------- TEST---------
+    raise RuntimeError(f"Could not load model from {BUNDLE_PATH}: {e}")
 
 
 # request schema, follows surveyQuestions.jsx field IDs
