@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 # Load model
-BUNDLE_PATH = os.path.join(os.path.dirname(__file__), "..", "lightGBM", "lgbm_overall_score.pkl")
+BUNDLE_PATH = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
 
 try:
     bundle = joblib.load(BUNDLE_PATH)
