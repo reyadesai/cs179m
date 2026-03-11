@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","https://cs179m.vercel.app"],
+    allow_origins=["http://localhost:5173","https://cs179m.vercel.app","https://cs179m-production-c459.up.railway.app/"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -337,16 +337,12 @@ def predict(answers: SurveyAnswers):
         feat_dict = compute_features(answers)
         raw = feat_dict.pop("_raw")
 
-        if model is not None:
-            X = pd.DataFrame([feat_dict])[features]
-            score = float(np.clip(model.predict(X)[0], 0, 100))
-        else:
-            # Fallback scoring if model file not found
-            mvpa = raw["mvpa"]
-            avg_sleep = raw["avg_sleep"]
-            activity_pts = 60 * min(mvpa / 150.0, 1.0)
-            sleep_pts = 40 * max(0, 1 - abs(avg_sleep - 8) / 4)
-            score = round(min(activity_pts + sleep_pts, 100), 1)
+        if model is None:
+            raise HTTPException(status_code=500, detail="Model not loaded on server.")
+
+        X = pd.DataFrame([feat_dict])[features]
+        score = float(np.clip(model.predict(X)[0], 0, 100))
+
 
         recommendations = generate_recommendations(raw, score)
 

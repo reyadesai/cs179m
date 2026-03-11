@@ -8,6 +8,7 @@ from lightgbm import LGBMRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import joblib
+import os
 
 
 # ----------------------------
@@ -162,7 +163,9 @@ def main():
             "jetlag_full_penalty_at_hours": 4,
         },
     }
-    joblib.dump(bundle, "lgbm_overall_score.pkl")
+    save_path = os.path.join(os.path.dirname(__file__), "lgbm_overall_score.pkl")
+    joblib.dump(bundle, save_path)
+
     print("Saved: lgbm_overall_score.pkl")
 
     # Show a few examples
