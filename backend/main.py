@@ -5,45 +5,51 @@ from typing import Optional
 import joblib
 import pandas as pd
 import numpy as np
+import pickle
 import os
-import traceback
 
 app = FastAPI()
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=[
-#         "http://localhost:5173",
-#         "https://cs179m.vercel.app",
-#         "https://cs179m-production-3be7.up.railway.app"
-#     ],
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
-app = FastAPI()
-origins = ["http://localhost:5173"] # for localhost testing
-
-# CORS config for Vercel + local dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",  # all Vercel domains
+    allow_origins=[
+        "http://localhost:5173", # Vite dev server
+        "https://cs179m.vercel.app", # Vercel link
+        "https://cs179m-production-3be7.up.railway.app", # Railway link
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-BUNDLE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lgbm_overall_score.pkl")
+# Load model once at startup
+MODEL_PATH = os.getenv("MODEL_PATH", "lgbm_overall_score.pkl")
+
+# BUNDLE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lgbm_overall_score.pkl")
+
+# try:
+#     bundle = joblib.load(BUNDLE_PATH)
+#     model = bundle["model"]
+#     features = bundle["features"]
+#     print(f"Model loaded. Features: {features}", flush=True)
+# except Exception as e:
+#     traceback.print_exc()
+#     raise RuntimeError(f"Could not load model from {BUNDLE_PATH}: {e}")
+
+def load_model():
+    if not os.path.exists(MODEL_PATH):
+        raise RuntimeError(f"Model file not found at: {MODEL_PATH}")
+    with open(MODEL_PATH, "rb") as f:
+        return pickle.load(f)
 
 try:
-    bundle = joblib.load(BUNDLE_PATH)
-    model = bundle["model"]
+    bundle   = joblib.load(MODEL_PATH)
+    model    = bundle["model"]
     features = bundle["features"]
-    print(f"Model loaded. Features: {features}", flush=True)
+    print(f"Model loaded from {MODEL_PATH}")
 except Exception as e:
-    traceback.print_exc()
-    raise RuntimeError(f"Could not load model from {BUNDLE_PATH}: {e}")
+    print(f"Model not loaded: {e}")
+    model = None
 
 
 # request schema, follows surveyQuestions.jsx field IDs
@@ -345,13 +351,19 @@ def generate_recommendations(raw: dict, score: float) -> list:
     return recs
 
 # check if railway is running
-@app.get("/ping")
-def ping():
-    return {"status": "pong"}
+@app.get("/")
+def root():
+    return {"status": "ok", "message": "ML API is running"}
 
+@app.get("/health")
+def health():
+    return {"status": "healthy", "model_loaded": model is not None}
 
 @app.post("/predict")
 def predict(answers: SurveyAnswers):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+
     try:
         feat_dict = compute_features(answers)
         raw = feat_dict.pop("_raw")
@@ -381,14 +393,10 @@ def predict(answers: SurveyAnswers):
 
 # @app.get("/health")
 # def health():
-#     return {"status": "ok", "model_loaded": model is not None}
-@app.get("/health")
-def health():
-    return {
-        "status": "ok",
-        "model_loaded": model is not None,
-        "cwd": os.getcwd(),
-        "bundle_path": BUNDLE_PATH,
-        "bundle_exists": os.path.exists(BUNDLE_PATH),
-    }
-
+#     return {
+#         "status": "ok",
+#         "model_loaded": model is not None,
+#         "cwd": os.getcwd(),
+#         "bundle_path": BUNDLE_PATH,
+#         "bundle_exists": os.path.exists(BUNDLE_PATH),
+#     }
