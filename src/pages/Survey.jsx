@@ -70,18 +70,98 @@ function InfoTip({ text }) {
   );
 }
 
-export default function Survey() {
+export default function Survey({ language = "en" }) {
   const location = useLocation();
   const navigate = useNavigate();
-
   const age = location.state?.age;
+
+  const text = {
+    en: {
+      oops: "Oops!",
+      startFromHome: "Please start the survey from the home page.",
+      goHome: "Go to Home",
+      stepMeta: [
+        {
+          label: "About You",
+          title: "Tell us about yourself",
+          subtitle: "This helps us personalize your sleep and activity insights.",
+        },
+        {
+          label: "Sleep",
+          title: "Sleep",
+          subtitle: "Questions about your sleep habits and schedule.",
+        },
+        {
+          label: "Activity",
+          title: "Physical Activity",
+          subtitle: "Questions about your daily movement and exercise.",
+        },
+        {
+          label: "Summary",
+          title: "Review",
+          subtitle: "Double-check your responses before submitting.",
+        },
+      ],
+      yes: "Yes",
+      no: "No",
+      timeFormat: "Time (12-hour format)",
+      perWeek: "per week",
+      minutes: "minutes",
+      hours: "hours",
+      back: "← Back",
+      next: "Next",
+      submit: "Submit",
+      analyzing: "Analyzing…",
+      serverError: "Could not reach the server. Is the backend running?",
+    },
+    es: {
+      oops: "¡Ups!",
+      startFromHome: "Por favor comienza la encuesta desde la página principal.",
+      goHome: "Ir al Inicio",
+      stepMeta: [
+        {
+          label: "Sobre Ti",
+          title: "Cuéntanos sobre ti",
+          subtitle: "Esto nos ayuda a personalizar tus recomendaciones de sueño y actividad.",
+        },
+        {
+          label: "Sueño",
+          title: "Sueño",
+          subtitle: "Preguntas sobre tus hábitos y horario de sueño.",
+        },
+        {
+          label: "Actividad",
+          title: "Actividad Física",
+          subtitle: "Preguntas sobre tu movimiento diario y ejercicio.",
+        },
+        {
+          label: "Resumen",
+          title: "Revisar",
+          subtitle: "Verifica tus respuestas antes de enviarlas.",
+        },
+      ],
+      yes: "Sí",
+      no: "No",
+      timeFormat: "Hora (formato de 12 horas)",
+      perWeek: "por semana",
+      minutes: "minutos",
+      hours: "horas",
+      back: "← Regresar",
+      next: "Siguiente",
+      submit: "Enviar",
+      analyzing: "Analizando…",
+      serverError: "No se pudo conectar con el servidor. ¿Está corriendo el backend?",
+    },
+  };
+
+  const t = text[language];
 
   if (!age) {
     return (
       <div style={{ padding: 32, maxWidth: 600, margin: "0 auto" }}>
-        <h2>Oops!</h2>
-        <p>Please start the survey from the home page.</p>
-        <button onClick={() => navigate("/")}>Go to Home</button>
+        <h2>{t.oops}</h2>
+        <p>{t.startFromHome}</p>
+        <button onClick={() => navigate("/")}>{t.goHome}</button>
       </div>
     );
   }
@@ -91,28 +171,7 @@ export default function Survey() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  const stepMeta = [
-    {
-      label: "About You",
-      title: "Tell us about yourself",
-      subtitle: "This helps us personalize your sleep and activity insights.",
-    },
-    {
-      label: "Sleep",
-      title: "Sleep",
-      subtitle: "Questions about your sleep habits and schedule.",
-    },
-    {
-      label: "Activity",
-      title: "Physical Activity",
-      subtitle: "Questions about your daily movement and exercise.",
-    },
-    {
-      label: "Summary",
-      title: "Review",
-      subtitle: "Double-check your responses before submitting.",
-    },
-  ];
+  const stepMeta = t.stepMeta;
 
   function updateAnswer(id, value) {
     setAnswers((prev) => ({ ...prev, [id]: value }));
@@ -122,7 +181,7 @@ export default function Survey() {
     const val = ans[question.id];
     if (val === undefined || val === null) return false;
 
-    if (question.type === "yesno") return val === "Yes" || val === "No";
+    if (question.type === "yesno") return val === "yes" || val === "no";
 
     if (question.type === "time12") {
       if (typeof val !== "object" || !val) return false;
@@ -176,41 +235,29 @@ export default function Survey() {
     });
   }, [answers]);
 
-  if (!visibleQuestions.length) {
-    return (
-      <div>
-        {/* <header className="gv-topbar">
-          <div className="gv-brand">SleepFit AI</div>
-          <div className="gv-lang">
-            <button className="gv-chip" type="button">English</button>
-            <button className="gv-chip" type="button">Español</button>
-          </div>
-        </header> */}
-        <main className="gv-shell">
-          {/* <section className="gv-card">
-            <h2>No questions to show</h2>
-            <div className="gv-sub">Your filters removed all questions.</div>
-            <div className="gv-footer">
-              <button className="gv-btn primary" onClick={() => navigate("/")} type="button">
-                Go Home
-              </button>
-            </div>
-          </section> */}
-        </main>
-      </div>
-    );
-  }
-
   const safeStep = Math.min(step, visibleQuestions.length - 1);
   const q = visibleQuestions[safeStep];
   const progressText = `${safeStep + 1} / ${visibleQuestions.length}`;
 
   function sectionToStepIndex(section) {
-    const s = String(section || "").toLowerCase();
-    if (s.includes("about") || s.includes("you")) return 0;
-    if (s.includes("sleep")) return 1;
-    if (s.includes("activity") || s.includes("exercise") || s.includes("physical")) return 2;
-    if (s.includes("summary") || s.includes("review")) return 3;
+    const s = String(
+      typeof section === "object" ? section[language] : section || ""
+    ).toLowerCase();
+
+    if (s.includes("about") || s.includes("sobre") || s.includes("you") || s.includes("ti")) return 0;
+    if (s.includes("sleep") || s.includes("sueño")) return 1;
+    if (
+      s.includes("activity") ||
+      s.includes("exercise") ||
+      s.includes("physical") ||
+      s.includes("actividad")
+    ) return 2;
+    if (
+      s.includes("summary") ||
+      s.includes("review") ||
+      s.includes("resumen") ||
+      s.includes("revisar")
+    ) return 3;
 
     const ratio = visibleQuestions.length
       ? safeStep / Math.max(1, visibleQuestions.length - 1)
@@ -229,9 +276,9 @@ export default function Survey() {
     if (!isAnswered(q)) return;
 
     if (safeStep === visibleQuestions.length - 1) {
-      // Last question —> submit to backend
       setSubmitting(true);
       setSubmitError(null);
+
       try {
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
         console.log("Calling API:", `${API_URL}/predict`);
@@ -245,13 +292,14 @@ export default function Survey() {
 
         if (!response.ok) {
           const err = await response.json();
-          throw new Error(err.detail || "Server error");
+          console.log("Backend error:", err);
+          throw new Error(JSON.stringify(err.detail) || "Server error");
         }
 
         const result = await response.json();
         navigate("/results", { state: { answers, result } });
       } catch (err) {
-        setSubmitError(err.message || "Could not reach the server. Is the backend running?");
+        setSubmitError(err.message || t.serverError);
       } finally {
         setSubmitting(false);
       }
@@ -263,10 +311,10 @@ export default function Survey() {
   const getDefaultAmPm = (questionId) => {
     const pmDefaults = ["bedtime", "usual_bedtime", "sleep_time"];
     const amDefaults = ["waketime", "wake_time", "usual_waketime"];
-    
-    if (pmDefaults.some(id => questionId.includes(id))) return "PM";
-    if (amDefaults.some(id => questionId.includes(id))) return "AM";
-    return "AM"; // default fallback
+
+    if (pmDefaults.some((id) => questionId.includes(id))) return "PM";
+    if (amDefaults.some((id) => questionId.includes(id))) return "AM";
+    return "AM";
   };
 
   const currentValue =
@@ -298,40 +346,53 @@ export default function Survey() {
           <h2>{stepMeta[stepIndex]?.title}</h2>
           <div className="gv-sub">{stepMeta[stepIndex]?.subtitle}</div>
 
-          <div style={{ marginTop: 12, color: "var(--gv-muted)", fontWeight: 700, fontSize: 13 }}>
+          <div
+            style={{
+              marginTop: 12,
+              color: "var(--gv-muted)",
+              fontWeight: 700,
+              fontSize: 13,
+            }}
+          >
             {progressText}
           </div>
 
           <div className="gv-q">
-            {q.question}
-            {q.info && <InfoTip text={q.info} />}
+            {q.question[language]}
+            {q.info && (
+              <InfoTip text={typeof q.info === "object" ? q.info[language] : q.info} />
+            )}
           </div>
 
-          {q.helper && <p style={{ opacity: 0.8 }}>{q.helper}</p>}
+          {q.helper && (
+            <p style={{ opacity: 0.8 }}>
+              {typeof q.helper === "object" ? q.helper[language] : q.helper}
+            </p>
+          )}
 
           {q.sublabel && (
             <div style={{ fontWeight: 600, marginTop: 18, marginBottom: 10 }}>
-              {q.sublabel}
+              {q.sublabel[language]}
             </div>
           )}
 
           {q.type === "yesno" && (
             <div className="gv-options" style={{ marginTop: 14 }}>
               <div
-                onClick={() => updateAnswer(q.id, "Yes")}
-                className={`gv-option ${answers[q.id] === "Yes" ? "selected" : ""}`}
+                onClick={() => updateAnswer(q.id, "yes")}
+                className={`gv-option ${answers[q.id] === "yes" ? "selected" : ""}`}
                 role="button"
                 tabIndex={0}
               >
-                Yes
+                {t.yes}
               </div>
               <div
-                onClick={() => updateAnswer(q.id, "No")}
-                className={`gv-option ${answers[q.id] === "No" ? "selected" : ""}`}
+                onClick={() => updateAnswer(q.id, "no")}
+                className={`gv-option ${answers[q.id] === "no" ? "selected" : ""}`}
                 role="button"
                 tabIndex={0}
               >
-                No
+                {t.no}
               </div>
             </div>
           )}
@@ -348,9 +409,10 @@ export default function Survey() {
             >
               {!q.sublabel && (
                 <div style={{ fontWeight: 600, marginTop: 10 }}>
-                  Time (12-hour format)
+                  {t.timeFormat}
                 </div>
               )}
+
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <select
                   value={currentValue.hour}
@@ -358,39 +420,67 @@ export default function Survey() {
                     updateAnswer(q.id, { ...currentValue, hour: e.target.value })
                   }
                   style={{
-                    width: 90, padding: 12, fontSize: 16, textAlign: "center",
-                    borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000",
+                    width: 90,
+                    padding: 12,
+                    fontSize: 16,
+                    textAlign: "center",
+                    borderRadius: 12,
+                    border: "2px solid var(--gv-border)",
+                    background: "#f5f7fa",
+                    color: "#000000",
                   }}
                 >
-                  <option value="" disabled>hh</option>
+                  <option value="" disabled>
+                    hh
+                  </option>
                   {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((h) => (
-                    <option key={h} value={h}>{h}</option>
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
                   ))}
                 </select>
+
                 <span style={{ fontSize: 18, fontWeight: 700 }}>:</span>
+
                 <select
                   value={currentValue.minute}
                   onChange={(e) =>
                     updateAnswer(q.id, { ...currentValue, minute: e.target.value })
                   }
                   style={{
-                    width: 90, padding: 12, fontSize: 16, textAlign: "center",
-                    borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000",
+                    width: 90,
+                    padding: 12,
+                    fontSize: 16,
+                    textAlign: "center",
+                    borderRadius: 12,
+                    border: "2px solid var(--gv-border)",
+                    background: "#f5f7fa",
+                    color: "#000000",
                   }}
                 >
-                  <option value="" disabled>mm</option>
+                  <option value="" disabled>
+                    mm
+                  </option>
                   {["00", "15", "30", "45"].map((m) => (
-                    <option key={m} value={m}>{m}</option>
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
                   ))}
                 </select>
+
                 <select
                   value={currentValue.ampm}
                   onChange={(e) =>
                     updateAnswer(q.id, { ...currentValue, ampm: e.target.value })
                   }
                   style={{
-                    width: 90, padding: 12, fontSize: 16,
-                    borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000",
+                    width: 90,
+                    padding: 12,
+                    fontSize: 16,
+                    borderRadius: 12,
+                    border: "2px solid var(--gv-border)",
+                    background: "#f5f7fa",
+                    color: "#000000",
                   }}
                 >
                   <option value="AM">AM</option>
@@ -401,44 +491,75 @@ export default function Survey() {
           )}
 
           {q.type === "frequency" && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center"}}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
               <input
                 type="number"
                 min="0"
                 value={currentValue.count}
-                onChange={(e) => updateAnswer(q.id, { ...currentValue, count: e.target.value })}
+                onChange={(e) =>
+                  updateAnswer(q.id, { ...currentValue, count: e.target.value })
+                }
                 className="gv-input"
-                style={{ width: 140, textAlign: "center", marginTop: 0, background: "#f5f7fa", color: "#000000"}}
+                style={{
+                  width: 140,
+                  textAlign: "center",
+                  marginTop: 0,
+                  background: "#f5f7fa",
+                  color: "#000000",
+                }}
               />
-              <span>per week</span>
-              {/* Client feedback: always assume per week, don't bother with day/year entries
-                  <select
-                value={currentValue.per}
-                onChange={(e) => updateAnswer(q.id, { ...currentValue, per: e.target.value })}
-                style={{ padding: 12, fontSize: 16, borderRadius: 12, border: "2px solid var(--gv-border)" }}
-              >
-                <option value="week">week</option>
-              </select> */}
+              <span>{t.perWeek}</span>
             </div>
           )}
 
           {q.type === "duration" && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center"}}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
               <input
                 type="number"
                 min="0"
                 value={currentValue.value}
-                onChange={(e) => updateAnswer(q.id, { ...currentValue, value: e.target.value })}
+                onChange={(e) =>
+                  updateAnswer(q.id, { ...currentValue, value: e.target.value })
+                }
                 className="gv-input"
-                style={{ width: 140, textAlign: "center", marginTop: 0, background: "#f5f7fa", color: "#000000"}}
+                style={{
+                  width: 140,
+                  textAlign: "center",
+                  marginTop: 0,
+                  background: "#f5f7fa",
+                  color: "#000000",
+                }}
               />
               <select
                 value={currentValue.unit}
-                onChange={(e) => updateAnswer(q.id, { ...currentValue, unit: e.target.value })}
-                style={{ padding: 12, fontSize: 16, borderRadius: 12, border: "2px solid var(--gv-border)", background: "#f5f7fa", color: "#000000"}}
+                onChange={(e) =>
+                  updateAnswer(q.id, { ...currentValue, unit: e.target.value })
+                }
+                style={{
+                  padding: 12,
+                  fontSize: 16,
+                  borderRadius: 12,
+                  border: "2px solid var(--gv-border)",
+                  background: "#f5f7fa",
+                  color: "#000000",
+                }}
               >
-                <option value="minutes">minutes</option>
-                <option value="hours">hours</option>
+                <option value="minutes">{t.minutes}</option>
+                <option value="hours">{t.hours}</option>
               </select>
             </div>
           )}
@@ -454,8 +575,6 @@ export default function Survey() {
               />
             )}
 
-          {/* {!isAnswered(q) && <div className="gv-error">Please answer to continue.</div>} */}
-
           {submitError && (
             <div className="gv-error" style={{ marginTop: 12 }}>
               ⚠ {submitError}
@@ -463,8 +582,13 @@ export default function Survey() {
           )}
 
           <div className="gv-footer">
-            <button className="gv-btn ghost" onClick={handleBack} type="button" disabled={submitting}>
-              ← Back
+            <button
+              className="gv-btn ghost"
+              onClick={handleBack}
+              type="button"
+              disabled={submitting}
+            >
+              {t.back}
             </button>
             <button
               className="gv-btn primary"
@@ -473,10 +597,10 @@ export default function Survey() {
               type="button"
             >
               {submitting
-                ? "Analyzing…"
+                ? t.analyzing
                 : safeStep === visibleQuestions.length - 1
-                ? "Submit"
-                : "Next"}
+                ? t.submit
+                : t.next}
             </button>
           </div>
         </section>
