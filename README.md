@@ -62,7 +62,7 @@ src/
 ---
 
 ## Demo
-<video controls src="Sleep_fit_demo.mov" title="Website Demonstration"></video>
+![Website Demonstration](https://github.com/user-attachments/assets/88705e03-b4d3-41f8-ac63-25641bd3f5f1)
 
 ---
 
