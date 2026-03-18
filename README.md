@@ -62,7 +62,7 @@ src/
 ---
 
 ## Demo
-![Website Demonstration](https://github.com/user-attachments/assets/88705e03-b4d3-41f8-ac63-25641bd3f5f1)
+<video src="https://github.com/user-attachments/assets/88705e03-b4d3-41f8-ac63-25641bd3f5f1" controls width="100%"></video>
 
 ---
 
