@@ -1,16 +1,75 @@
-# React + Vite
+# SleepFit AI
+ > Expanding access to preventative healthcare through personalized risk assessments based on CDC sleep and exercise data.
+ 
+Contributors: [Reya Desai](https://github.com/reyadesai), [Mehakdeep Kaeley](https://github.com/Macd1p), [Angel Montes](https://github.com/Aimgel), [Nada Salib](https://github.com/nadasalib)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## Motivation
+Healthcare is currently a luxury of the well-resourced. By using sleep and exercise data recorded by the CDC, we alleviate the financial and geographic barriers to preventative care. Our goal is to expand access to healthcare information to neglected populations in a quick and affordable way. We encourage preventative measures for at-risk individuals by providing risk assessments and actionable recommendations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## How It Works
+The user completes a short questionnaire covering lifestyle habits like sleep duration and physical activity. This input is passed to a **Light Gradient Boosting Machine (LGBM)** trained on NHANES data from the CDC. The model produces an overall health risk score, and **SHAP values** are used to identify which factors contributed most to that score. The result is a plain-language report with personalized CDC-backed recommendations.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Features
+- **Comprehensive Questionnaire** — Digestible questions designed to gauge lifestyle habits without requiring medical knowledge.
+- **Risk Assessment** — A scored evaluation of the user's current habits relative to CDC guidelines.
+- **Personalized Report** — Summarizes the user's risk level, the habits contributing to it, and concrete recommendations to improve.
+- **Privacy-First** — No personal data is stored. The session is stateless by design.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Tech Stack
+| Layer | Technology | Why |
+|---|---|---|
+| Frontend | React + Vite | Component-based UI with fast development builds |
+| Backend | FastAPI | Lightweight and fast for serving ML model responses |
+| ML Model | Python (LightGBM) | Efficient gradient boosting for tabular health data |
+| Explainability | SHAP | Surfaces which factors drive each user's risk score |
+| Data | CDC NHANES | Nationally representative sleep and activity datasets |
+
+---
+
+## Project Structure
+```
+backend/
+├── main.py                  # FastAPI app and API endpoints
+├── GBM_both_data.py         # Model training and evaluation logic
+├── lgbm_overall_score.pkl   # Trained LightGBM model (serialized)
+└── shap_overallScore.py     # SHAP explainability scoring
+
+data/
+├── nhanes_physical_activity/
+│   ├── data/                # Raw and cleaned CDC activity datasets
+│   └── notebooks/           # Exploratory analysis and preprocessing
+└── nhanes_sleep/
+    ├── data/                # Raw and cleaned CDC sleep datasets
+    └── notebooks/           # Exploratory analysis and preprocessing
+
+src/
+├── components/
+├── pages/
+│   ├── Landing.jsx          # Home/intro page
+│   ├── Survey.jsx           # Questionnaire interface
+│   └── Results.jsx          # Summary & recommendation display
+└── assets/
+```
+
+---
+
+## Demo
+<video controls src="Sleep_fit_demo.mov" title="Website Demonstration"></video>
+
+---
+
+## Navigation
+<img src="SleepFitAI_Navigation_Diagram.png?raw=true" width="1000">
+
+---
+
+## Acknowledgements
+This project was completed as part of CS179M (Project in Computer Science: Artificial Intelligence) under the guidance of Professor LePendu and client discussions with Dr. Rodriguez.
